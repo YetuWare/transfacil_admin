@@ -1,7 +1,7 @@
 import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
-  BankDetail, University, DashboardStats,
+  BankDetail, University, DashboardStats, Trip,
 } from '../types/api';
 
 export const authService = {

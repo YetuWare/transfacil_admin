@@ -220,7 +220,7 @@ export default function Trips() {
             </Grid>
             <Grid size={12}>
               <TextField fullWidth label="Data e Hora de Partida" type="datetime-local" value={form.departure_time}
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
                 onChange={(e) => setForm({ ...form, departure_time: e.target.value })} />
             </Grid>
             <Grid size={6}>
