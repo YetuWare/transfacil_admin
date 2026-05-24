@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://transfacil-backend.onrender.com/api/',
+        target: 'https://transfacil-backend.onrender.com/api',
         changeOrigin: true,
       },
     },
