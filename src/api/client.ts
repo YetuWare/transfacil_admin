@@ -8,13 +8,12 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
-  if (!res.ok) throw new Error(`Erro do servidor (${res.status})`);
   const text = await res.text();
   let json: ApiResponse<T>;
   try {
     json = JSON.parse(text);
   } catch {
-    throw new Error('Resposta inválida do servidor.');
+    throw new Error(`Resposta inválida do servidor (${res.status}).`);
   }
   if (!json.success) throw new Error(json.error || 'Erro desconhecido');
   return json.data;
