@@ -13,6 +13,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   scheduled: { label: 'Agendado', color: '#3B82F6', bg: '#DBEAFE' },
   completed: { label: 'Concluído', color: colors.success, bg: '#D1FAE5' },
   in_progress: { label: 'Em Curso', color: '#8B5CF6', bg: '#EDE9FE' },
+  resolved: { label: 'Resolvido', color: colors.success, bg: '#D1FAE5' },
   used: { label: 'Usado', color: colors.grey, bg: '#F3F4F6' },
   true: { label: 'Sim', color: colors.success, bg: '#D1FAE5' },
   false: { label: 'Não', color: colors.error, bg: '#FEE2E2' },

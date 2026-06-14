@@ -159,6 +159,19 @@ export interface Booking {
   trips?: Trip;
 }
 
+export interface SupportRequest {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  status: 'pending' | 'in_progress' | 'resolved';
+  admin_response?: string | null;
+  resolved_by?: string | null;
+  resolved_at?: string | null;
+  created_at: string;
+  user?: { id: string; full_name: string; email: string };
+}
+
 export interface DashboardStats {
   total_users: number;
   pending_users: number;
@@ -166,4 +179,5 @@ export interface DashboardStats {
   pending_payments: number;
   upcoming_trips: number;
   pending_event_bookings: number;
+  pending_support_requests: number;
 }

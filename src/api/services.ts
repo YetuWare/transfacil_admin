@@ -1,7 +1,7 @@
 import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
-  BankDetail, University, DashboardStats, Trip,
+  BankDetail, University, DashboardStats, Trip, SupportRequest,
 } from '../types/api';
 
 export const authService = {
@@ -131,6 +131,13 @@ export const universitiesService = {
   update: (id: string, data: Partial<University>) =>
     api.put<University>(`/universities/${id}`, data),
   delete: (id: string) => api.del<void>(`/universities/${id}`),
+};
+
+export const supportService = {
+  list: (status?: string) =>
+    api.get<SupportRequest[]>(`/admin/support-requests${status ? `?status=${status}` : ''}`),
+  updateStatus: (id: string, status: string, admin_response?: string) =>
+    api.put<SupportRequest>(`/admin/support-requests/${id}/status`, { status, admin_response }),
 };
 
 export const statsService = {

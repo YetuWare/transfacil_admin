@@ -14,6 +14,7 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import SchoolIcon from '@mui/icons-material/School';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import { colors } from '../../theme';
@@ -34,6 +35,7 @@ const menuItems = [
   { label: 'Reservas Eventos', icon: <EventNoteIcon />, path: '/event-bookings' },
   { label: 'Dados Bancários', icon: <AccountBalanceIcon />, path: '/bank-details' },
   { label: 'Universidades', icon: <SchoolIcon />, path: '/universities' },
+  { label: 'Pedidos de Suporte', icon: <ContactSupportIcon />, path: '/support-requests' },
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {

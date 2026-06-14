@@ -3,6 +3,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import EventIcon from '@mui/icons-material/Event';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -50,6 +51,7 @@ export default function Dashboard() {
         { label: 'Utilizadores por aprovar', value: stats.pending_users, icon: <PeopleIcon sx={{ fontSize: 18 }} />, color: colors.warning },
         { label: 'Pagamentos pendentes', value: stats.pending_payments, icon: <ConfirmationNumberIcon sx={{ fontSize: 18 }} />, color: colors.warning },
         { label: 'Reservas de eventos', value: stats.pending_event_bookings, icon: <EventIcon sx={{ fontSize: 18 }} />, color: colors.secondary },
+        { label: 'Suporte pendente', value: stats.pending_support_requests, icon: <ContactSupportIcon sx={{ fontSize: 18 }} />, color: '#8B5CF6' },
         { label: 'Próximas viagens', value: stats.upcoming_trips, icon: <DirectionsBusIcon sx={{ fontSize: 18 }} />, color: colors.info },
       ]
     : [];
@@ -83,6 +85,12 @@ export default function Dashboard() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatsCard title="Reservas Pendentes" value={stats?.pending_event_bookings ?? 0} icon={<EventIcon />}
               color={colors.secondary} subtitle="Aguardam confirmação" loading={loading} />
+          </Grid>
+        </Grid>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatsCard title="Suporte Pendente" value={stats?.pending_support_requests ?? 0} icon={<ContactSupportIcon />}
+              color="#8B5CF6" subtitle="Pedidos por responder" loading={loading} />
           </Grid>
         </Grid>
 
@@ -179,7 +187,7 @@ export default function Dashboard() {
             </Box>
             <Grid container spacing={2}>
               {pendingItems.map((item) => (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={item.label}>
+                <Grid size={{ xs: 12, sm: 6, md: 2.4 }} key={item.label}>
                   <Box sx={{
                     p: 2, borderRadius: 3,
                     bgcolor: badgeBg(item.color),
