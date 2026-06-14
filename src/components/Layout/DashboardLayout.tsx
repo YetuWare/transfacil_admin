@@ -6,7 +6,7 @@ import {
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import CardMembershipIcon from '@mui/icons-material/CardMembership';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import RouteIcon from '@mui/icons-material/Route';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import EventIcon from '@mui/icons-material/Event';
@@ -15,9 +15,9 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import SchoolIcon from '@mui/icons-material/School';
 import LogoutIcon from '@mui/icons-material/Logout';
-import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import { colors } from '../../theme';
-import { authService } from '../../api/services';
+import type { User } from '../../types/api';
 
 const DRAWER_WIDTH = 260;
 
@@ -43,6 +43,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   const goTo = (path: string) => { navigate(path); onClose?.(); };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    window.location.href = '/login';
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: colors.dark, color: '#fff' }}>
@@ -71,7 +77,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       </List>
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.08)' }} />
       <List sx={{ px: 1, py: 1 }}>
-        <ListItemButton onClick={async () => { try { await authService.logout(); } catch {} finally { window.location.href = '/login'; } }}
+        <ListItemButton onClick={handleLogout}
           sx={{ py: 1, px: 1.5 }}>
           <ListItemIcon sx={{ minWidth: 34, color: 'rgba(255,255,255,0.3)' }}><LogoutIcon /></ListItemIcon>
           <ListItemText primary="Sair" slotProps={{ primary: { fontSize: 14, color: 'rgba(255,255,255,0.5)' } } as any} />
@@ -81,6 +87,17 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   );
 }
 
+function isTokenExpired(): boolean {
+  const token = localStorage.getItem('admin_token');
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export default function DashboardLayout() {
   const isMobile = useMediaQuery('(max-width:900px)');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -88,17 +105,21 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    authService.me()
-      .then((user) => {
-        if (user.role !== 'admin' && user.role !== 'super_admin') {
-          navigate('/login', { replace: true });
-          return;
-        }
-        setChecking(false);
-      })
-      .catch(() => {
-        navigate('/login', { replace: true });
-      });
+    const token = localStorage.getItem('admin_token');
+    const userStr = localStorage.getItem('admin_user');
+    if (!token || !userStr || isTokenExpired()) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      navigate('/login', { replace: true });
+      return;
+    }
+    const user: User = JSON.parse(userStr);
+    if (user.role !== 'admin' && user.role !== 'super_admin') {
+      localStorage.clear();
+      navigate('/login', { replace: true });
+      return;
+    }
+    setChecking(false);
   }, []);
 
   if (checking) {

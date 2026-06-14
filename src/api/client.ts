@@ -2,10 +2,21 @@ import type { ApiResponse } from '../types/api';
 
 const BASE = import.meta.env.VITE_API_URL || '/api';
 
+function getToken(): string | null {
+  return localStorage.getItem('admin_token');
+}
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = getToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch(`${BASE}${url}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
   const text = await res.text();
@@ -20,7 +31,10 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 async function requestBlob(url: string): Promise<Blob> {
-  const res = await fetch(`${BASE}${url}`, { credentials: 'include' });
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${BASE}${url}`, { credentials: 'include', headers });
   if (!res.ok) throw new Error('Erro ao descarregar');
   return res.blob();
 }
@@ -35,7 +49,10 @@ export const api = {
   upload: <T>(url: string, file: File) => {
     const form = new FormData();
     form.append('image', file);
-    return fetch(`${BASE}${url}`, { method: 'POST', credentials: 'include', body: form })
+    const headers: Record<string, string> = {};
+    const token = getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetch(`${BASE}${url}`, { method: 'POST', credentials: 'include', headers, body: form })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erro do servidor (${r.status})`);
         const text = await r.text();

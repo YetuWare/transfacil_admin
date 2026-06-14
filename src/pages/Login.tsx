@@ -21,11 +21,12 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const user = await authService.login(email, password);
-      if (user.role !== 'admin' && user.role !== 'super_admin') {
-        await authService.logout();
+      const data = await authService.login(email, password);
+      if (data.user.role !== 'admin' && data.user.role !== 'super_admin') {
         throw new Error('Acesso negado. Apenas administradores podem aceder a este painel.');
       }
+      localStorage.setItem('admin_token', data.token);
+      localStorage.setItem('admin_user', JSON.stringify(data.user));
       navigate('/');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao autenticar');

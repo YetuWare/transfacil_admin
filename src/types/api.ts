@@ -90,6 +90,7 @@ export interface EventData {
   price_round_trip: number;
   available_seats: number;
   total_seats: number;
+  max_seats_per_user?: number | null;
   is_active: boolean;
   event_trips?: EventTrip[];
   created_at: string;
@@ -102,6 +103,7 @@ export interface EventBooking {
   trip_type: 'one_way' | 'return' | 'round_trip';
   pickup_address: string;
   amount: number;
+  seats?: number;
   payment_status: string;
   payment_proof_url: string | null;
   qr_token: string | null;

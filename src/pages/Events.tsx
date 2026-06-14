@@ -21,6 +21,7 @@ interface FormUser { id: string; full_name: string; }
 const emptyForm = {
   title: '', description: '', event_date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16),
   origin: '', destination: '', price_one_way: 0, price_return: 0, price_round_trip: 0, is_active: true,
+  max_seats_per_user: '',
 };
 
 const emptyTripForm = {
@@ -59,6 +60,7 @@ export default function Events() {
       event_date: e.event_date.slice(0, 16), origin: e.origin, destination: e.destination,
       price_one_way: e.price_one_way, price_return: e.price_return, price_round_trip: e.price_round_trip,
       is_active: e.is_active,
+      max_seats_per_user: e.max_seats_per_user?.toString() ?? '',
     });
     setImageFile(null);
     setDialog({ open: true, event: e });
@@ -66,8 +68,12 @@ export default function Events() {
 
   const handleSave = async () => {
     try {
+      const payload = {
+        ...form,
+        max_seats_per_user: form.max_seats_per_user ? Number(form.max_seats_per_user) : undefined,
+      };
       if (dialog.event) {
-        await eventsService.update(dialog.event.id, form);
+        await eventsService.update(dialog.event.id, payload);
         if (imageFile) {
           setUploading(true);
           await eventsService.uploadImage(dialog.event.id, imageFile);
@@ -75,7 +81,7 @@ export default function Events() {
         }
         notify('Evento actualizado com sucesso.', 'success');
       } else {
-        const created = await eventsService.create(form);
+        const created = await eventsService.create(payload);
         if (imageFile) {
           setUploading(true);
           await eventsService.uploadImage((created as any).id, imageFile);
@@ -309,6 +315,11 @@ export default function Events() {
                   Já tem imagem. Seleccione uma para substituir.
                 </Typography>
               )}
+            </Grid>
+            <Grid size={12}>
+              <TextField fullWidth label="Máx. lugares por utilizador" type="number" value={form.max_seats_per_user}
+                onChange={(e) => setForm({ ...form, max_seats_per_user: e.target.value })}
+                helperText="Deixe vazio para ilimitado" />
             </Grid>
           </Grid>
         </DialogContent>
