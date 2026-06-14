@@ -28,12 +28,12 @@ export default function Dashboard() {
 
   const barData = stats
     ? [
-        { name: 'Utilizadores\nActivos', value: activeUsers, fill: colors.success },
-        { name: 'Subscrições\nActivas', value: stats.active_subscriptions, fill: colors.success },
-        { name: 'Utilizadores\nPendentes', value: stats.pending_users, fill: colors.warning },
-        { name: 'Pagamentos\nPendentes', value: stats.pending_payments, fill: colors.warning },
-        { name: 'Reservas\nPendentes', value: stats.pending_event_bookings, fill: colors.secondary },
-        { name: 'Próximas\nViagens', value: stats.upcoming_trips, fill: colors.info },
+        { name: 'Activos', value: activeUsers, fill: colors.success },
+        { name: 'Subscrições', value: stats.active_subscriptions, fill: colors.success },
+        { name: 'Pendentes', value: stats.pending_users, fill: colors.warning },
+        { name: 'Pagamentos', value: stats.pending_payments, fill: colors.warning },
+        { name: 'Reservas', value: stats.pending_event_bookings, fill: colors.secondary },
+        { name: 'Viagens', value: stats.upcoming_trips, fill: colors.info },
       ]
     : [];
 
@@ -106,13 +106,13 @@ export default function Dashboard() {
                 <Typography variant="caption" sx={{ color: colors.grey, display: 'block', mb: 2 }}>
                   Distribuição de métricas do sistema
                 </Typography>
-                {stats ? (
+                  {stats ? (
                   <ResponsiveContainer width="100%" height={320}>
-                    <BarChart data={barData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}
+                    <BarChart data={barData} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}
                       barCategoryGap="20%">
                       <CartesianGrid strokeDasharray="3 3" stroke={colors.greyLighter} vertical={false} />
                       <XAxis dataKey="name" tick={{ fontSize: 11, fill: colors.grey }} axisLine={false} tickLine={false}
-                        tickMargin={4} />
+                        tickMargin={8} angle={-25} textAnchor="end" height={50} />
                       <YAxis tick={{ fontSize: 11, fill: colors.grey }} axisLine={false} tickLine={false} />
                       <Tooltip {...chartTooltip} />
                       <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={48}
@@ -138,9 +138,9 @@ export default function Dashboard() {
                 <Typography variant="caption" sx={{ color: colors.grey, display: 'block', mb: 1 }}>
                   Visão agregada do sistema
                 </Typography>
-                {stats ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 320 }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                  {stats ? (
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', justifyContent: 'center', height: 320, gap: 2 }}>
+                    <ResponsiveContainer width="60%" height="100%">
                       <PieChart>
                         <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={95}
                           dataKey="value" paddingAngle={3} cornerRadius={4}>
@@ -149,7 +149,7 @@ export default function Dashboard() {
                         <Tooltip {...chartTooltip} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <Box sx={{ ml: -2 }}>
+                    <Box>
                       {pieData.map((e) => (
                         <Box key={e.name} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.2 }}>
                           <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: e.color, flexShrink: 0 }} />
