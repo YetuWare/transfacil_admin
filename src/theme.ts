@@ -4,6 +4,7 @@ const colors = {
   primary: '#C8E600',
   primaryDark: '#B0CC00',
   primaryLight: '#E4F57A',
+  primarySurface: '#F2FABF',
   secondary: '#FF8F00',
   background: '#F0F2F5',
   surface: '#FFFFFF',

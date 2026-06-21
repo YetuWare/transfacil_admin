@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import {
   Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Skeleton, Alert, Snackbar, Switch, IconButton, Grid, Typography,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Skeleton, Alert, Snackbar, Switch, IconButton, Grid, Typography, Chip,
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RouteIcon from '@mui/icons-material/Route';
+import AddLocationIcon from '@mui/icons-material/AddLocation';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import Header from '../components/Layout/Header';
 import { useApiData } from '../hooks/useApiData';
 import { routesService } from '../api/services';
 import { colors } from '../theme';
 import type { Route } from '../types/api';
 
-const emptyForm = { origin: '', destination: '', estimated_duration_min: 0, is_active: true };
+interface StopForm { name: string; estimated_time: string; }
+const emptyForm = { origin: '', destination: '', estimated_duration_min: 0, is_active: true, stops: [] as StopForm[] };
+const emptyStop = { name: '', estimated_time: '' };
 
 export default function Routes() {
   const { onMenuClick } = useOutletContext<{ onMenuClick: () => void }>();
@@ -31,14 +35,34 @@ export default function Routes() {
     setForm({
       origin: r.origin, destination: r.destination,
       estimated_duration_min: r.estimated_duration_min ?? 0, is_active: r.is_active,
+      stops: (r.stops ?? []).map((s: any) => ({ name: s.name, estimated_time: s.estimated_time ?? '' })),
     });
     setDialog({ open: true, route: r });
   };
 
+  const addStop = () => setForm({ ...form, stops: [...form.stops, { ...emptyStop }] });
+  const removeStop = (i: number) => setForm({ ...form, stops: form.stops.filter((_, idx) => idx !== i) });
+  const updateStop = (i: number, field: keyof StopForm, value: string) => {
+    const stops = [...form.stops];
+    stops[i] = { ...stops[i], [field]: value };
+    setForm({ ...form, stops });
+  };
+
   const handleSave = async () => {
     try {
-      if (dialog.route) { await routesService.update(dialog.route.id, form); notify('Rota actualizada.', 'success'); }
-      else { await routesService.create(form); notify('Rota criada.', 'success'); }
+      const payload: any = {
+        origin: form.origin,
+        destination: form.destination,
+        estimated_duration_min: form.estimated_duration_min || null,
+        is_active: form.is_active,
+        stops: form.stops.map((s, idx) => ({
+          name: s.name,
+          estimated_time: s.estimated_time || undefined,
+          order: idx,
+        })).filter(s => s.name.trim()),
+      };
+      if (dialog.route) { await routesService.update(dialog.route.id, payload); notify('Rota actualizada.', 'success'); }
+      else { await routesService.create(payload); notify('Rota criada.', 'success'); }
       setDialog({ open: false }); refetch();
     } catch (err: unknown) { notify(err instanceof Error ? err.message : 'Erro ao guardar', 'error'); }
   };
@@ -80,6 +104,7 @@ export default function Routes() {
                     <TableCell>Origem</TableCell>
                     <TableCell>Destino</TableCell>
                     <TableCell>Duração</TableCell>
+                    <TableCell>Paragens</TableCell>
                     <TableCell>Activo</TableCell>
                     <TableCell width={120} align="center">Acções</TableCell>
                   </TableRow>
@@ -95,6 +120,10 @@ export default function Routes() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ color: colors.grey, fontSize: 13 }}>{r.estimated_duration_min ?? '—'} min</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip label={`${(r.stops ?? []).length} paragens`} size="small"
+                          sx={{ bgcolor: colors.primarySurface, color: colors.primaryDark, fontWeight: 600, fontSize: 12 }} />
                       </TableCell>
                       <TableCell><Switch checked={r.is_active} size="small" disabled /></TableCell>
                       <TableCell align="center">
@@ -115,7 +144,7 @@ export default function Routes() {
           )}
         </Card>
       </Box>
-      <Dialog open={dialog.open} onClose={() => setDialog({ open: false })} maxWidth="sm" fullWidth>
+      <Dialog open={dialog.open} onClose={() => setDialog({ open: false })} maxWidth="md" fullWidth>
         <DialogTitle>{dialog.route ? 'Editar Rota' : 'Nova Rota'}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ pt: 1 }}>
@@ -136,6 +165,25 @@ export default function Routes() {
                 <Switch checked={form.is_active} size="small" onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />
                 <Typography variant="body2" sx={{ color: colors.grey, fontSize: 13 }}>Rota activa</Typography>
               </Box>
+            </Grid>
+            <Grid size={12}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 14, color: colors.grey }}>Paragens</Typography>
+                <Button size="small" startIcon={<AddLocationIcon />} onClick={addStop}
+                  sx={{ textTransform: 'none', fontSize: 13 }}>Adicionar Paragem</Button>
+              </Box>
+              {form.stops.map((stop, idx) => (
+                <Box key={idx} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
+                  <Chip label={idx + 1} size="small" sx={{ minWidth: 28, fontWeight: 700 }} />
+                  <TextField size="small" placeholder="Nome da paragem" value={stop.name}
+                    onChange={(e) => updateStop(idx, 'name', e.target.value)} sx={{ flex: 1 }} />
+                  <TextField size="small" placeholder="Tempo (min)" type="number" value={stop.estimated_time}
+                    onChange={(e) => updateStop(idx, 'estimated_time', e.target.value)} sx={{ width: 120 }} />
+                  <IconButton size="small" onClick={() => removeStop(idx)} color="error">
+                    <RemoveCircleIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
             </Grid>
           </Grid>
         </DialogContent>

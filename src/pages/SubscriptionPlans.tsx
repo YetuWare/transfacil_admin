@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Skeleton, Alert, Snackbar, Switch, IconButton, Grid, Typography,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Skeleton, Alert, Snackbar, Switch, IconButton, Grid, Typography, ToggleButtonGroup, ToggleButton,
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
@@ -13,7 +13,15 @@ import { plansService } from '../api/services';
 import { colors } from '../theme';
 import type { SubscriptionPlan } from '../types/api';
 
-const emptyForm = { name: '', price: 0, duration_months: 1, is_active: true };
+const emptyForm = { name: '', price: 0, duration_months: 1, duration_days: null as number | null, is_active: true, durationType: 'monthly' as 'weekly' | 'monthly', duration_weeks: 1 };
+
+function formatDuration(p: SubscriptionPlan): string {
+  if (p.duration_days) {
+    const weeks = p.duration_days / 7;
+    return `${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+  }
+  return `${p.duration_months} ${p.duration_months === 1 ? 'mês' : 'meses'}`;
+}
 
 export default function SubscriptionPlans() {
   const { onMenuClick } = useOutletContext<{ onMenuClick: () => void }>();
@@ -26,14 +34,32 @@ export default function SubscriptionPlans() {
 
   const openCreate = () => { setForm(emptyForm); setDialog({ open: true }); };
   const openEdit = (p: SubscriptionPlan) => {
-    setForm({ name: p.name, price: p.price, duration_months: p.duration_months, is_active: p.is_active });
+    const hasDurationDays = !!p.duration_days;
+    setForm({
+      name: p.name, price: p.price, duration_months: p.duration_months,
+      duration_days: p.duration_days, is_active: p.is_active,
+      durationType: hasDurationDays ? 'weekly' : 'monthly',
+      duration_weeks: hasDurationDays ? p.duration_days! / 7 : 1,
+    });
     setDialog({ open: true, plan: p });
   };
 
   const handleSave = async () => {
     try {
-      if (dialog.plan) { await plansService.update(dialog.plan.id, form); notify('Plano actualizado.', 'success'); }
-      else { await plansService.create(form); notify('Plano criado.', 'success'); }
+      const payload: any = {
+        name: form.name,
+        price: form.price,
+        is_active: form.is_active,
+      };
+      if (form.durationType === 'weekly') {
+        payload.duration_months = 1;
+        payload.duration_days = form.duration_weeks * 7;
+      } else {
+        payload.duration_months = form.duration_months;
+        payload.duration_days = null;
+      }
+      if (dialog.plan) { await plansService.update(dialog.plan.id, payload); notify('Plano actualizado.', 'success'); }
+      else { await plansService.create(payload); notify('Plano criado.', 'success'); }
       setDialog({ open: false }); refetch();
     } catch (err: unknown) { notify(err instanceof Error ? err.message : 'Erro ao guardar', 'error'); }
   };
@@ -81,7 +107,7 @@ export default function SubscriptionPlans() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ color: colors.grey, fontSize: 13 }}>
-                          {p.duration_months} {p.duration_months === 1 ? 'mês' : 'meses'}
+                          {formatDuration(p)}
                         </Typography>
                       </TableCell>
                       <TableCell><Switch checked={p.is_active} size="small" disabled /></TableCell>
@@ -112,9 +138,29 @@ export default function SubscriptionPlans() {
                 onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} />
             </Grid>
             <Grid size={6}>
-              <TextField fullWidth label="Duração (meses)" type="number" value={form.duration_months}
-                onChange={(e) => setForm({ ...form, duration_months: Number(e.target.value) })} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, height: '100%', pt: 1 }}>
+                <ToggleButtonGroup
+                  value={form.durationType}
+                  exclusive
+                  size="small"
+                  onChange={(_, v) => v && setForm({ ...form, durationType: v })}
+                >
+                  <ToggleButton value="monthly" sx={{ fontSize: 12, px: 2 }}>Mensal</ToggleButton>
+                  <ToggleButton value="weekly" sx={{ fontSize: 12, px: 2 }}>Semanal</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
             </Grid>
+            {form.durationType === 'weekly' ? (
+              <Grid size={6}>
+                <TextField fullWidth label="Duração (semanas)" type="number" value={form.duration_weeks}
+                  onChange={(e) => setForm({ ...form, duration_weeks: Number(e.target.value) })} />
+              </Grid>
+            ) : (
+              <Grid size={6}>
+                <TextField fullWidth label="Duração (meses)" type="number" value={form.duration_months}
+                  onChange={(e) => setForm({ ...form, duration_months: Number(e.target.value) })} />
+              </Grid>
+            )}
             <Grid size={6}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, height: '100%', pt: 1 }}>
                 <Switch checked={form.is_active} size="small" onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />

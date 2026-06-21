@@ -24,9 +24,11 @@ export interface SubscriptionPlan {
   id: string;
   name: string;
   duration_months: number;
+  duration_days: number | null;
   price: number;
   is_active: boolean;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface Subscription {
@@ -49,6 +51,7 @@ export interface Route {
   origin: string;
   destination: string;
   estimated_duration_min: number | null;
+  stops?: Array<{ name: string; estimated_time?: string; order: number }>;
   is_active: boolean;
   created_at: string;
 }
