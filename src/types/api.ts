@@ -134,6 +134,13 @@ export interface University {
   created_at: string;
 }
 
+export interface Course {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface Trip {
   id: string;
   route_id: string;

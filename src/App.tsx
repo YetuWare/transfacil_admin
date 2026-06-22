@@ -13,6 +13,7 @@ import Events from './pages/Events';
 import EventBookings from './pages/EventBookings';
 import BankDetails from './pages/BankDetails';
 import Universities from './pages/Universities';
+import Courses from './pages/Courses';
 import Trips from './pages/Trips';
 import SupportRequests from './pages/SupportRequests';
 import Login from './pages/Login';
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/event-bookings" element={<EventBookings />} />
             <Route path="/bank-details" element={<BankDetails />} />
             <Route path="/universities" element={<Universities />} />
+            <Route path="/courses" element={<Courses />} />
             <Route path="/support-requests" element={<SupportRequests />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

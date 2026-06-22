@@ -1,7 +1,7 @@
 import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
-  BankDetail, University, DashboardStats, Trip, SupportRequest,
+  BankDetail, University, Course, DashboardStats, Trip, SupportRequest,
 } from '../types/api';
 
 export const authService = {
@@ -131,6 +131,15 @@ export const universitiesService = {
   update: (id: string, data: Partial<University>) =>
     api.put<University>(`/universities/${id}`, data),
   delete: (id: string) => api.del<void>(`/universities/${id}`),
+};
+
+export const coursesService = {
+  list: () => api.get<Course[]>('/courses/all'),
+  create: (name: string) =>
+    api.post<Course>('/courses', { name }),
+  update: (id: string, data: Partial<Course>) =>
+    api.put<Course>(`/courses/${id}`, data),
+  delete: (id: string) => api.del<void>(`/courses/${id}`),
 };
 
 export const supportService = {
