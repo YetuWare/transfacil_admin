@@ -24,13 +24,13 @@ export default function Config() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await configService.get();
-        if (res.data) {
+        const config = await configService.get();
+        if (config) {
           setForm({
-            contact_email: res.data.contact_email || '',
-            contact_phone: res.data.contact_phone || '',
-            contact_hours_pt: res.data.contact_hours_pt || '',
-            contact_hours_en: res.data.contact_hours_en || '',
+            contact_email: config.contact_email || '',
+            contact_phone: config.contact_phone || '',
+            contact_hours_pt: config.contact_hours_pt || '',
+            contact_hours_en: config.contact_hours_en || '',
           });
         }
       } catch {
