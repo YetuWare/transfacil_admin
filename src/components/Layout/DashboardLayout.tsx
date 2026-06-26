@@ -16,6 +16,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import SchoolIcon from '@mui/icons-material/School';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import { colors } from '../../theme';
@@ -37,6 +39,8 @@ const menuItems = [
   { label: 'Dados Bancários', icon: <AccountBalanceIcon />, path: '/bank-details' },
   { label: 'Universidades', icon: <SchoolIcon />, path: '/universities' },
   { label: 'Cursos', icon: <MenuBookIcon />, path: '/courses' },
+  { label: 'Configurações', icon: <SettingsIcon />, path: '/config' },
+  { label: 'FAQs', icon: <LiveHelpIcon />, path: '/faqs' },
   { label: 'Pedidos de Suporte', icon: <ContactSupportIcon />, path: '/support-requests' },
 ];
 

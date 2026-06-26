@@ -16,6 +16,8 @@ import Universities from './pages/Universities';
 import Courses from './pages/Courses';
 import Trips from './pages/Trips';
 import SupportRequests from './pages/SupportRequests';
+import Config from './pages/Config';
+import Faqs from './pages/Faqs';
 import Login from './pages/Login';
 
 export default function App() {
@@ -40,6 +42,8 @@ export default function App() {
             <Route path="/universities" element={<Universities />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/support-requests" element={<SupportRequests />} />
+            <Route path="/config" element={<Config />} />
+            <Route path="/faqs" element={<Faqs />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

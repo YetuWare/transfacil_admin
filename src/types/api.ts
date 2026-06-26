@@ -182,6 +182,28 @@ export interface SupportRequest {
   user?: { id: string; full_name: string; email: string };
 }
 
+export interface AppConfig {
+  id: string;
+  contact_email: string;
+  contact_phone: string;
+  contact_hours_pt: string;
+  contact_hours_en: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Faq {
+  id: string;
+  question_pt: string;
+  question_en: string;
+  answer_pt: string;
+  answer_en: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DashboardStats {
   total_users: number;
   pending_users: number;

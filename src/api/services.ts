@@ -1,7 +1,7 @@
 import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
-  BankDetail, University, Course, DashboardStats, Trip, SupportRequest,
+  BankDetail, University, Course, DashboardStats, Trip, SupportRequest, AppConfig, Faq,
 } from '../types/api';
 
 export const authService = {
@@ -151,4 +151,16 @@ export const supportService = {
 
 export const statsService = {
   get: () => api.get<DashboardStats>('/admin/stats'),
+};
+
+export const configService = {
+  get: () => api.get<AppConfig>('/admin/config'),
+  update: (data: Partial<AppConfig>) => api.put<AppConfig>('/admin/config', data),
+};
+
+export const faqsService = {
+  list: () => api.get<Faq[]>('/admin/faqs'),
+  create: (data: Partial<Faq>) => api.post<Faq>('/admin/faqs', data),
+  update: (id: string, data: Partial<Faq>) => api.put<Faq>(`/admin/faqs/${id}`, data),
+  delete: (id: string) => api.del<void>(`/admin/faqs/${id}`),
 };
