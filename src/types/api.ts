@@ -40,6 +40,13 @@ export interface Subscription {
   end_date: string | null;
   payment_proof_url: string | null;
   payment_notes: string | null;
+  merchant_transaction_id?: string | null;
+  ekwanza_transaction_id?: string | null;
+  payment_method?: 'REF' | 'GPO' | null;
+  payment_reference?: string | null;
+  payment_entity?: string | null;
+  payment_expires_at?: string | null;
+  paid_at?: string | null;
   created_at: string;
   users?: { full_name: string; email: string };
   subscription_plans?: { name: string; duration_months: number; price: number };
@@ -109,6 +116,14 @@ export interface EventBooking {
   seats?: number;
   payment_status: string;
   payment_proof_url: string | null;
+  payment_notes?: string | null;
+  merchant_transaction_id?: string | null;
+  ekwanza_transaction_id?: string | null;
+  payment_method?: 'REF' | 'GPO' | null;
+  payment_reference?: string | null;
+  payment_entity?: string | null;
+  payment_expires_at?: string | null;
+  paid_at?: string | null;
   qr_token: string | null;
   created_at: string;
   users?: { full_name: string; email: string };

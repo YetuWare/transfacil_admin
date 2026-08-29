@@ -24,7 +24,7 @@ export default function EventBookings() {
   const [rejectNotes, setRejectNotes] = useState('');
   const [snackbar, setSnackbar] = useState<any>({ open: false, message: '', severity: 'success' });
 
-  const fetcher = tab === 0 ? () => eventBookingsService.list('pending') : () => eventBookingsService.list();
+  const fetcher = tab === 0 ? () => eventBookingsService.list('pending') : tab === 2 ? () => eventBookingsService.list('expired') : () => eventBookingsService.list();
   const { data: bookings, loading, refetch } = useApiData(fetcher, [tab]);
 
   const allBookings = (bookings as EventBooking[]) || [];
@@ -78,6 +78,7 @@ export default function EventBookings() {
             <Tabs value={tab} onChange={(_, v) => setTab(v)}>
               <Tab label="Pendentes" />
               <Tab label="Todas" />
+              <Tab label="Expiradas" />
             </Tabs>
           </CardContent>
         </Card>
@@ -103,7 +104,7 @@ export default function EventBookings() {
                       <TableCell>Evento</TableCell>
                       <TableCell>Tipo</TableCell>
                       <TableCell>Valor</TableCell>
-                      <TableCell>Comprovativo</TableCell>
+                      <TableCell>Pagamento (REF/GPO)</TableCell>
                       <TableCell>Estado</TableCell>
                       <TableCell width={200} align="center">Acções</TableCell>
                     </TableRow>
@@ -125,11 +126,23 @@ export default function EventBookings() {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        {b.payment_proof_url ? (
-                          <Button size="small" sx={{ borderRadius: 2, fontSize: 11, textTransform: 'none' }}
-                            href={b.payment_proof_url} target="_blank" rel="noopener">
-                            Comprovativo
-                          </Button>
+                        {b.payment_method ? (
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 12 }}>
+                              {b.payment_method === 'REF' ? 'Referência' : 'MCX Express'}
+                              {b.payment_reference ? ` • ${b.payment_reference}` : ''}
+                              {b.payment_entity ? ` (Ent. ${b.payment_entity})` : ''}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: colors.grey, fontSize: 11 }}>
+                              {b.merchant_transaction_id ? `Txn: ${b.merchant_transaction_id.slice(0, 16)}…` : ''}
+                              {b.payment_expires_at ? ` • Expira: ${new Date(b.payment_expires_at).toLocaleString('pt-PT')}` : ''}
+                            </Typography>
+                            {b.ekwanza_transaction_id && (
+                              <Typography variant="caption" sx={{ color: colors.success, display: 'block', fontSize: 11 }}>EKZ: {b.ekwanza_transaction_id}</Typography>
+                            )}
+                          </Box>
+                        ) : b.payment_proof_url ? (
+                          <Typography variant="caption" sx={{ color: colors.warning }}>Legado: comprovativo</Typography>
                         ) : (
                           <Typography variant="caption" sx={{ color: colors.greyLight }}>—</Typography>
                         )}
@@ -137,20 +150,26 @@ export default function EventBookings() {
                       <TableCell><StatusBadge status={b.payment_status} /></TableCell>
                       <TableCell align="center">
                         {b.payment_status === 'pending' ? (
-                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                            <Button size="small" variant="contained"
-                              startIcon={<CheckCircleIcon />}
-                              onClick={() => handleApprove(b.id)}
-                              sx={{ borderRadius: 2, fontSize: 12, bgcolor: colors.success, '&:hover': { bgcolor: '#059669' } }}>
-                              Aprovar
-                            </Button>
-                            <Button size="small" variant="outlined" color="error"
-                              startIcon={<CancelIcon />}
-                              onClick={() => setRejectDialog({ open: true, id: b.id })}
-                              sx={{ borderRadius: 2, fontSize: 12 }}>
-                              Rejeitar
-                            </Button>
-                          </Box>
+                          b.payment_method ? (
+                            <Typography variant="caption" sx={{ color: colors.info, fontWeight: 600, fontSize: 11 }}>
+                              Aguarda AppyPay<br />{b.payment_method === 'GPO' ? 'MCX push' : 'Referência'}
+                            </Typography>
+                          ) : (
+                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                              <Button size="small" variant="contained"
+                                startIcon={<CheckCircleIcon />}
+                                onClick={() => handleApprove(b.id)}
+                                sx={{ borderRadius: 2, fontSize: 12, bgcolor: colors.success, '&:hover': { bgcolor: '#059669' } }}>
+                                Aprovar
+                              </Button>
+                              <Button size="small" variant="outlined" color="error"
+                                startIcon={<CancelIcon />}
+                                onClick={() => setRejectDialog({ open: true, id: b.id })}
+                                sx={{ borderRadius: 2, fontSize: 12 }}>
+                                Rejeitar
+                              </Button>
+                            </Box>
+                          )
                         ) : (
                           <Typography variant="body2" sx={{ color: colors.greyLight, fontSize: 13 }}>—</Typography>
                         )}

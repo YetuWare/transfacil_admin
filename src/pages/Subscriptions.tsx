@@ -116,7 +116,7 @@ export default function Subscriptions() {
                     <TableCell>Plano</TableCell>
                     <TableCell>Estado</TableCell>
                     <TableCell>Período</TableCell>
-                    <TableCell>Comprovativo</TableCell>
+                    <TableCell>Pagamento (REF/GPO)</TableCell>
                     <TableCell width={200} align="center">Acções</TableCell>
                   </TableRow>
                 </TableHead>
@@ -140,30 +140,50 @@ export default function Subscriptions() {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        {s.payment_proof_url ? (
-                          <Button size="small" variant="text"
-                            href={s.payment_proof_url} target="_blank"
-                            sx={{ fontSize: 12, textTransform: 'none', fontWeight: 600, color: colors.info }}>
-                            Ver Comprovativo
-                          </Button>
-                        ) : <Typography variant="body2" sx={{ color: colors.greyLight, fontSize: 13 }}>—</Typography>}
+                        {s.payment_method ? (
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 12 }}>
+                              {s.payment_method === 'REF' ? 'Referência' : 'MCX Express'}
+                              {s.payment_reference ? ` • ${s.payment_reference}` : ''}
+                              {s.payment_entity ? ` (Ent. ${s.payment_entity})` : ''}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: colors.grey, fontSize: 11 }}>
+                              {s.merchant_transaction_id ? `Txn: ${s.merchant_transaction_id.slice(0, 16)}…` : ''}
+                              {s.payment_expires_at ? ` • Expira: ${new Date(s.payment_expires_at).toLocaleString('pt-PT')}` : ''}
+                            </Typography>
+                            {s.ekwanza_transaction_id && (
+                              <Typography variant="caption" sx={{ color: colors.success, display: 'block', fontSize: 11 }}>EKZ: {s.ekwanza_transaction_id}</Typography>
+                            )}
+                          </Box>
+                        ) : s.payment_proof_url ? (
+                          <Typography variant="caption" sx={{ color: colors.warning }}>Legado: comprovativo</Typography>
+                        ) : (
+                          <Typography variant="body2" sx={{ color: colors.greyLight, fontSize: 13 }}>—</Typography>
+                        )}
                       </TableCell>
                       <TableCell align="center">
                         {s.status === 'pending_payment' ? (
-                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                            <Button size="small" variant="contained"
-                              startIcon={<CheckCircleIcon />}
-                              onClick={() => { setApproveDialog({ open: true, id: s.id }); setStartDate(new Date().toISOString().split('T')[0]); }}
-                              sx={{ borderRadius: 2, fontSize: 12, bgcolor: colors.success, '&:hover': { bgcolor: '#059669' } }}>
-                              Aprovar
-                            </Button>
-                            <Button size="small" variant="outlined" color="error"
-                              startIcon={<CancelIcon />}
-                              onClick={() => setRejectDialog({ open: true, id: s.id })}
-                              sx={{ borderRadius: 2, fontSize: 12 }}>
-                              Rejeitar
-                            </Button>
-                          </Box>
+                          s.payment_method ? (
+                            <Typography variant="caption" sx={{ color: colors.info, fontWeight: 600, fontSize: 11 }}>
+                              Aguarda pagamento AppyPay<br />
+                              {s.payment_method === 'GPO' ? 'MCX push enviado' : 'Referência gerada'}
+                            </Typography>
+                          ) : (
+                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                              <Button size="small" variant="contained"
+                                startIcon={<CheckCircleIcon />}
+                                onClick={() => { setApproveDialog({ open: true, id: s.id }); setStartDate(new Date().toISOString().split('T')[0]); }}
+                                sx={{ borderRadius: 2, fontSize: 12, bgcolor: colors.success, '&:hover': { bgcolor: '#059669' } }}>
+                                Aprovar
+                              </Button>
+                              <Button size="small" variant="outlined" color="error"
+                                startIcon={<CancelIcon />}
+                                onClick={() => setRejectDialog({ open: true, id: s.id })}
+                                sx={{ borderRadius: 2, fontSize: 12 }}>
+                                Rejeitar
+                              </Button>
+                            </Box>
+                          )
                         ) : (
                           <Typography variant="body2" sx={{ color: colors.greyLight, fontSize: 13 }}>—</Typography>
                         )}
