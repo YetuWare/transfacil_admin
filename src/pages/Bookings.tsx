@@ -15,6 +15,7 @@ import type { Booking } from '../types/api';
 
 const statusTabs = [
   { label: 'Activas', filter: 'active' },
+  { label: 'Pag. Pendente', filter: 'pending_payment' },
   { label: 'Usadas', filter: 'used' },
   { label: 'Canceladas', filter: 'cancelled' },
   { label: 'Todas', filter: '' },
@@ -84,6 +85,7 @@ export default function Bookings() {
                     <TableCell>Estudante</TableCell>
                     <TableCell>Rota</TableCell>
                     <TableCell>Data/Hora</TableCell>
+                    <TableCell>Tipo</TableCell>
                     <TableCell>Estado</TableCell>
                     <TableCell>QR Code</TableCell>
                     <TableCell>Validação</TableCell>
@@ -107,6 +109,22 @@ export default function Bookings() {
                         <Typography variant="body2" sx={{ fontSize: 13, color: colors.grey, whiteSpace: 'nowrap' }}>
                           {b.trips?.departure_time ? fmtDate(b.trips.departure_time) : '—'}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {b.is_extra ? (
+                          <Box>
+                            <Chip label={`Extra · ${Number(b.amount ?? 0).toLocaleString('pt-PT')} Kz`} size="small"
+                              sx={{ fontWeight: 700, fontSize: 11, bgcolor: '#EDE9FE', color: '#6D28D9' }} />
+                            {b.payment_method && (
+                              <Typography variant="caption" sx={{ display: 'block', color: colors.grey, mt: 0.5 }}>
+                                {b.payment_method === 'REF' ? `Ref. ${b.payment_reference ?? '—'}` : 'MCX Express'}
+                                {b.paid_at ? ` · pago ${fmtDate(b.paid_at)}` : ''}
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" sx={{ fontSize: 12, color: colors.grey }}>Passe</Typography>
+                        )}
                       </TableCell>
                       <TableCell><StatusBadge status={b.status} /></TableCell>
                       <TableCell>

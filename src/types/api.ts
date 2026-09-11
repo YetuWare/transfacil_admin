@@ -176,9 +176,18 @@ export interface Booking {
   student_id: string;
   trip_id: string;
   qr_token: string;
-  status: 'active' | 'used' | 'cancelled';
+  status: 'active' | 'used' | 'cancelled' | 'pending_payment';
   validated_at: string | null;
   validated_by: string | null;
+  // Viagem extra paga
+  is_extra?: boolean;
+  amount?: number | null;
+  payment_method?: 'REF' | 'GPO' | null;
+  payment_reference?: string | null;
+  payment_entity?: string | null;
+  payment_expires_at?: string | null;
+  paid_at?: string | null;
+  payment_notes?: string | null;
   created_at: string;
   users?: { id: string; full_name: string; email: string; student_number: string | null };
   trips?: Trip;
@@ -203,6 +212,7 @@ export interface AppConfig {
   contact_phone: string;
   contact_hours_pt: string;
   contact_hours_en: string;
+  extra_trip_price: number;
   created_at: string;
   updated_at: string;
 }

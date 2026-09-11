@@ -5,12 +5,13 @@ import {
 import { useOutletContext } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PaidIcon from '@mui/icons-material/Paid';
 import Header from '../components/Layout/Header';
 import { configService } from '../api/services';
 import { colors } from '../theme';
 import type { AppConfig } from '../types/api';
 
-const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '' };
+const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '', extra_trip_price: '0' };
 
 export default function Config() {
   const { onMenuClick } = useOutletContext<{ onMenuClick: () => void }>();
@@ -31,6 +32,7 @@ export default function Config() {
             contact_phone: config.contact_phone || '',
             contact_hours_pt: config.contact_hours_pt || '',
             contact_hours_en: config.contact_hours_en || '',
+            extra_trip_price: String(config.extra_trip_price ?? 0),
           });
         }
       } catch {
@@ -44,7 +46,12 @@ export default function Config() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await configService.update(form);
+      const price = Number(form.extra_trip_price);
+      if (Number.isNaN(price) || price < 0) {
+        notify('Preço da viagem extra inválido.', 'error');
+        return;
+      }
+      await configService.update({ ...form, extra_trip_price: price });
       notify('Configuração actualizada com sucesso.', 'success');
     } catch (err: unknown) {
       notify(err instanceof Error ? err.message : 'Erro ao guardar', 'error');
@@ -53,11 +60,9 @@ export default function Config() {
     }
   };
 
-  const hasChanges = form.contact_email !== '' || form.contact_phone !== '' || form.contact_hours_pt !== '' || form.contact_hours_en !== '';
-
   return (
     <>
-      <Header title="Configurações" subtitle="Gerir informações de contacto da aplicação" onMenuClick={onMenuClick} />
+      <Header title="Configurações" subtitle="Contactos da aplicação e preço das viagens extra" onMenuClick={onMenuClick} />
       <Box sx={{ p: { xs: 2, md: 4 } }}>
         <Card sx={{ p: 4, border: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {loading ? (
@@ -84,6 +89,19 @@ export default function Config() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField fullWidth label="Horário (EN)" value={form.contact_hours_en}
                     onChange={(e) => setForm({ ...form, contact_hours_en: e.target.value })} placeholder="Ex: Mon-Fri, 08:00 - 18:00" />
+                </Grid>
+              </Grid>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 5, mb: 3 }}>
+                <PaidIcon sx={{ color: colors.primary }} />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Viagens extra</Typography>
+              </Box>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField fullWidth type="number" label="Preço da viagem extra (Kz)" value={form.extra_trip_price}
+                    onChange={(e) => setForm({ ...form, extra_trip_price: e.target.value })}
+                    slotProps={{ htmlInput: { min: 0, step: 50 } }}
+                    helperText="Cobrado quando o estudante excede as 2 reservas diárias do passe. 0 desactiva as viagens extra." />
                 </Grid>
               </Grid>
               <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
