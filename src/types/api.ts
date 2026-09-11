@@ -238,3 +238,36 @@ export interface DashboardStats {
   pending_event_bookings: number;
   pending_support_requests: number;
 }
+
+export interface AuditLog {
+  id: string;
+  actor_id: string | null;
+  actor_email: string | null;
+  actor_role: string | null;
+  action: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  description: string | null;
+  metadata: Record<string, unknown>;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AuditLogFilters {
+  actor_email?: string;
+  action?: string;
+  entity_type?: string;
+  entity_id?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+}

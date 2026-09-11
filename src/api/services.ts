@@ -2,6 +2,7 @@ import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
   BankDetail, University, Course, DashboardStats, Trip, SupportRequest, AppConfig, Faq,
+  AuditLog, AuditLogFilters, Paginated,
 } from '../types/api';
 
 export const authService = {
@@ -163,4 +164,16 @@ export const faqsService = {
   create: (data: Partial<Faq>) => api.post<Faq>('/admin/faqs', data),
   update: (id: string, data: Partial<Faq>) => api.put<Faq>(`/admin/faqs/${id}`, data),
   delete: (id: string) => api.del<void>(`/admin/faqs/${id}`),
+};
+
+export const auditService = {
+  list: (filters: AuditLogFilters) => {
+    const q = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+    });
+    const s = q.toString();
+    return api.get<Paginated<AuditLog>>(`/admin/audit-logs${s ? `?${s}` : ''}`);
+  },
+  facets: () => api.get<{ actions: string[]; entity_types: string[] }>('/admin/audit-logs/facets'),
 };

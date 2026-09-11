@@ -19,6 +19,7 @@ import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import LogoutIcon from '@mui/icons-material/Logout';
+import HistoryIcon from '@mui/icons-material/History';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import { colors } from '../../theme';
 import type { User } from '../../types/api';
@@ -42,6 +43,7 @@ const menuItems = [
   { label: 'Configurações', icon: <SettingsIcon />, path: '/config' },
   { label: 'FAQs', icon: <LiveHelpIcon />, path: '/faqs' },
   { label: 'Pedidos de Suporte', icon: <ContactSupportIcon />, path: '/support-requests' },
+  { label: 'Auditoria', icon: <HistoryIcon />, path: '/audit-logs' },
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {

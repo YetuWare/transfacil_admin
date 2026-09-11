@@ -18,6 +18,7 @@ import Trips from './pages/Trips';
 import SupportRequests from './pages/SupportRequests';
 import Config from './pages/Config';
 import Faqs from './pages/Faqs';
+import AuditLogs from './pages/AuditLogs';
 import Login from './pages/Login';
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/support-requests" element={<SupportRequests />} />
             <Route path="/config" element={<Config />} />
             <Route path="/faqs" element={<Faqs />} />
+            <Route path="/audit-logs" element={<AuditLogs />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
