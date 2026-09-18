@@ -19,6 +19,7 @@ import TripSchedules from './pages/TripSchedules';
 import SupportRequests from './pages/SupportRequests';
 import Config from './pages/Config';
 import Faqs from './pages/Faqs';
+import Payments from './pages/Payments';
 import AuditLogs from './pages/AuditLogs';
 import Login from './pages/Login';
 
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/payments" element={<Payments />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/subscription-plans" element={<SubscriptionPlans />} />
             <Route path="/routes" element={<RoutesPage />} />

@@ -2,7 +2,7 @@ import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
   BankDetail, University, Course, DashboardStats, Trip, SupportRequest, AppConfig, Faq,
-  AuditLog, AuditLogFilters, Paginated, TripSchedule,
+  AuditLog, AuditLogFilters, Paginated, TripSchedule, PaymentRow, PaymentsSummary, PaymentFilters,
 } from '../types/api';
 
 export const authService = {
@@ -189,4 +189,15 @@ export const tripSchedulesService = {
 export const tripActionsService = {
   cancel: (id: string, reason?: string) =>
     api.put<{ bookings_cancelled: number }>(`/admin/trips/${id}/cancel`, { reason }),
+};
+
+export const paymentsService = {
+  list: (filters: PaymentFilters) => {
+    const q = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+    });
+    const s = q.toString();
+    return api.get<Paginated<PaymentRow> & { summary: PaymentsSummary }>(`/admin/payments${s ? `?${s}` : ''}`);
+  },
 };

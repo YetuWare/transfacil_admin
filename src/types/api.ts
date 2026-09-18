@@ -298,3 +298,44 @@ export interface TripSchedule {
   users?: { id: string; full_name: string; phone: string | null };
   generated?: { created: number; skipped: number };
 }
+
+export type PaymentStatus = 'paid' | 'pending' | 'expired' | 'failed';
+export type PaymentType = 'subscription' | 'event' | 'trip';
+
+export interface PaymentRow {
+  id: string;
+  type: PaymentType;
+  user_id: string | null;
+  user_name: string | null;
+  user_email: string | null;
+  title: string;
+  amount: number;
+  status: PaymentStatus;
+  raw_status: string;
+  payment_method: 'REF' | 'GPO' | null;
+  payment_reference: string | null;
+  payment_entity: string | null;
+  merchant_transaction_id: string | null;
+  payment_expires_at: string | null;
+  paid_at: string | null;
+  created_at: string;
+}
+
+export interface PaymentsSummary {
+  all: { count: number; amount: number };
+  paid: { count: number; amount: number };
+  pending: { count: number; amount: number };
+  expired: { count: number; amount: number };
+  failed: { count: number; amount: number };
+}
+
+export interface PaymentFilters {
+  type?: string;
+  status?: string;
+  method?: string;
+  from?: string;
+  to?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+}
