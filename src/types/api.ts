@@ -216,6 +216,7 @@ export interface AppConfig {
   contact_hours_pt: string;
   contact_hours_en: string;
   extra_trip_price: number;
+  booking_window_hours: number;
   created_at: string;
   updated_at: string;
 }

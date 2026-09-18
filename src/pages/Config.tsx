@@ -6,12 +6,13 @@ import { useOutletContext } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PaidIcon from '@mui/icons-material/Paid';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import Header from '../components/Layout/Header';
 import { configService } from '../api/services';
 import { colors } from '../theme';
 import type { AppConfig } from '../types/api';
 
-const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '', extra_trip_price: '0' };
+const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '', extra_trip_price: '0', booking_window_hours: '48' };
 
 export default function Config() {
   const { onMenuClick } = useOutletContext<{ onMenuClick: () => void }>();
@@ -33,6 +34,7 @@ export default function Config() {
             contact_hours_pt: config.contact_hours_pt || '',
             contact_hours_en: config.contact_hours_en || '',
             extra_trip_price: String(config.extra_trip_price ?? 0),
+            booking_window_hours: String(config.booking_window_hours ?? 48),
           });
         }
       } catch {
@@ -51,7 +53,12 @@ export default function Config() {
         notify('Preço da viagem extra inválido.', 'error');
         return;
       }
-      await configService.update({ ...form, extra_trip_price: price });
+      const windowHours = Number(form.booking_window_hours);
+      if (!Number.isInteger(windowHours) || windowHours < 0 || windowHours > 720) {
+        notify('Antecedência inválida (0 a 720 horas).', 'error');
+        return;
+      }
+      await configService.update({ ...form, extra_trip_price: price, booking_window_hours: windowHours });
       notify('Configuração actualizada com sucesso.', 'success');
     } catch (err: unknown) {
       notify(err instanceof Error ? err.message : 'Erro ao guardar', 'error');
@@ -62,7 +69,7 @@ export default function Config() {
 
   return (
     <>
-      <Header title="Configurações" subtitle="Contactos da aplicação e preço das viagens extra" onMenuClick={onMenuClick} />
+      <Header title="Configurações" subtitle="Contactos, preço das viagens extra e janela de reservas" onMenuClick={onMenuClick} />
       <Box sx={{ p: { xs: 2, md: 4 } }}>
         <Card sx={{ p: 4, border: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {loading ? (
@@ -102,6 +109,19 @@ export default function Config() {
                     onChange={(e) => setForm({ ...form, extra_trip_price: e.target.value })}
                     slotProps={{ htmlInput: { min: 0, step: 50 } }}
                     helperText="Cobrado quando o estudante excede as 2 reservas diárias do passe. 0 desactiva as viagens extra." />
+                </Grid>
+              </Grid>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 5, mb: 3 }}>
+                <ScheduleIcon sx={{ color: colors.primary }} />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Reservas</Typography>
+              </Box>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField fullWidth type="number" label="Viagens visíveis (horas antes da partida)"
+                    value={form.booking_window_hours}
+                    onChange={(e) => setForm({ ...form, booking_window_hours: e.target.value })}
+                    slotProps={{ htmlInput: { min: 0, max: 720, step: 12 } }}
+                    helperText="As viagens são criadas com duas semanas de antecedência, mas só aparecem ao estudante dentro desta janela. 0 mostra todas." />
                 </Grid>
               </Grid>
               <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
