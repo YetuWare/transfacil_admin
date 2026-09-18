@@ -12,7 +12,7 @@ import { configService } from '../api/services';
 import { colors } from '../theme';
 import type { AppConfig } from '../types/api';
 
-const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '', extra_trip_price: '0', booking_window_hours: '48' };
+const emptyForm = { contact_email: '', contact_phone: '', contact_hours_pt: '', contact_hours_en: '', extra_trip_price: '0', booking_window_hours: '48', generation_horizon_days: '7' };
 
 export default function Config() {
   const { onMenuClick } = useOutletContext<{ onMenuClick: () => void }>();
@@ -35,6 +35,7 @@ export default function Config() {
             contact_hours_en: config.contact_hours_en || '',
             extra_trip_price: String(config.extra_trip_price ?? 0),
             booking_window_hours: String(config.booking_window_hours ?? 48),
+            generation_horizon_days: String(config.generation_horizon_days ?? 7),
           });
         }
       } catch {
@@ -58,7 +59,17 @@ export default function Config() {
         notify('Antecedência inválida (0 a 720 horas).', 'error');
         return;
       }
-      await configService.update({ ...form, extra_trip_price: price, booking_window_hours: windowHours });
+      const horizonDays = Number(form.generation_horizon_days);
+      if (!Number.isInteger(horizonDays) || horizonDays < 1 || horizonDays > 60) {
+        notify('Antecedência de criação inválida (1 a 60 dias).', 'error');
+        return;
+      }
+      await configService.update({
+        ...form,
+        extra_trip_price: price,
+        booking_window_hours: windowHours,
+        generation_horizon_days: horizonDays,
+      });
       notify('Configuração actualizada com sucesso.', 'success');
     } catch (err: unknown) {
       notify(err instanceof Error ? err.message : 'Erro ao guardar', 'error');
@@ -121,7 +132,14 @@ export default function Config() {
                     value={form.booking_window_hours}
                     onChange={(e) => setForm({ ...form, booking_window_hours: e.target.value })}
                     slotProps={{ htmlInput: { min: 0, max: 720, step: 12 } }}
-                    helperText="As viagens são criadas com duas semanas de antecedência, mas só aparecem ao estudante dentro desta janela. 0 mostra todas." />
+                    helperText="Uma viagem só aparece ao estudante dentro desta janela antes da partida. 0 mostra todas." />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField fullWidth type="number" label="Viagens criadas com (dias de antecedência)"
+                    value={form.generation_horizon_days}
+                    onChange={(e) => setForm({ ...form, generation_horizon_days: e.target.value })}
+                    slotProps={{ htmlInput: { min: 1, max: 60 } }}
+                    helperText="Até onde os horários criam viagens. Precisa de cobrir a janela acima — se for menor, é ajustado automaticamente." />
                 </Grid>
               </Grid>
               <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
