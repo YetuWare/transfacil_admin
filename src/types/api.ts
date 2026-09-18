@@ -169,6 +169,9 @@ export interface Trip {
   routes?: { name: string; origin: string; destination: string };
   vehicles?: { plate: string; model: string };
   users?: { full_name: string; phone: string };
+  schedule_id?: string | null;
+  service_date?: string | null;
+  direction?: 'outbound' | 'return';
 }
 
 export interface Booking {
@@ -270,4 +273,26 @@ export interface AuditLogFilters {
   to?: string;
   page?: number;
   limit?: number;
+}
+
+export interface TripSchedule {
+  id: string;
+  name: string | null;
+  route_id: string;
+  vehicle_id: string;
+  driver_id: string;
+  departure_time: string;            // HH:MM:SS (hora de Luanda)
+  return_departure_time: string | null;
+  weekdays: number[];                // 1 = segunda ... 7 = domingo
+  valid_from: string;
+  valid_until: string | null;
+  total_seats: number;
+  stops: { name: string; estimated_time?: string; order: number }[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  routes?: { id: string; name: string; origin: string; destination: string };
+  vehicles?: { id: string; plate: string; model: string | null; capacity: number };
+  users?: { id: string; full_name: string; phone: string | null };
+  generated?: { created: number; skipped: number };
 }

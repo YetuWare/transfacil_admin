@@ -20,6 +20,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HistoryIcon from '@mui/icons-material/History';
+import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import { colors } from '../../theme';
 import type { User } from '../../types/api';
@@ -32,6 +33,7 @@ const menuItems = [
   { label: 'Subscrições', icon: <ConfirmationNumberIcon />, path: '/subscriptions' },
   { label: 'Reservas', icon: <BookOnlineIcon />, path: '/bookings' },
   { label: 'Viagens', icon: <DirectionsBusIcon />, path: '/trips' },
+  { label: 'Horários', icon: <EventRepeatIcon />, path: '/trip-schedules' },
   { label: 'Planos', icon: <CardMembershipIcon />, path: '/subscription-plans' },
   { label: 'Rotas', icon: <RouteIcon />, path: '/routes' },
   { label: 'Viaturas', icon: <LocalShippingIcon />, path: '/vehicles' },

@@ -2,7 +2,7 @@ import { api } from './client';
 import type {
   User, Subscription, SubscriptionPlan, Route, Vehicle, EventData, EventTrip, EventBooking, Booking,
   BankDetail, University, Course, DashboardStats, Trip, SupportRequest, AppConfig, Faq,
-  AuditLog, AuditLogFilters, Paginated,
+  AuditLog, AuditLogFilters, Paginated, TripSchedule,
 } from '../types/api';
 
 export const authService = {
@@ -176,4 +176,17 @@ export const auditService = {
     return api.get<Paginated<AuditLog>>(`/admin/audit-logs${s ? `?${s}` : ''}`);
   },
   facets: () => api.get<{ actions: string[]; entity_types: string[] }>('/admin/audit-logs/facets'),
+};
+
+export const tripSchedulesService = {
+  list: () => api.get<TripSchedule[]>('/admin/trip-schedules'),
+  create: (data: Partial<TripSchedule>) => api.post<TripSchedule>('/admin/trip-schedules', data),
+  update: (id: string, data: Partial<TripSchedule>) => api.put<TripSchedule>(`/admin/trip-schedules/${id}`, data),
+  deactivate: (id: string) => api.del<{ trips_removed: number }>(`/admin/trip-schedules/${id}`),
+  generate: () => api.post<{ created: number; skipped: number; closed: number }>('/admin/trip-schedules/generate'),
+};
+
+export const tripActionsService = {
+  cancel: (id: string, reason?: string) =>
+    api.put<{ bookings_cancelled: number }>(`/admin/trips/${id}/cancel`, { reason }),
 };

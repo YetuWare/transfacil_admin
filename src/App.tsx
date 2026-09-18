@@ -15,6 +15,7 @@ import BankDetails from './pages/BankDetails';
 import Universities from './pages/Universities';
 import Courses from './pages/Courses';
 import Trips from './pages/Trips';
+import TripSchedules from './pages/TripSchedules';
 import SupportRequests from './pages/SupportRequests';
 import Config from './pages/Config';
 import Faqs from './pages/Faqs';
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/routes" element={<RoutesPage />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/trips" element={<Trips />} />
+            <Route path="/trip-schedules" element={<TripSchedules />} />
             <Route path="/events" element={<Events />} />
             <Route path="/event-bookings" element={<EventBookings />} />
             <Route path="/bank-details" element={<BankDetails />} />

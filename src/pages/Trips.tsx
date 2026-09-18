@@ -3,15 +3,16 @@ import {
   Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Skeleton,
   Alert, Snackbar, IconButton, Grid, Typography, MenuItem, Select, InputLabel,
-  FormControl, Chip,
+  FormControl, Chip, Tooltip,
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Header from '../components/Layout/Header';
 import { useApiData } from '../hooks/useApiData';
-import { tripsService, routesService, vehiclesService, usersService } from '../api/services';
+import { tripsService, routesService, vehiclesService, usersService, tripActionsService } from '../api/services';
 import { colors } from '../theme';
 import type { Trip, Route, Vehicle, User } from '../types/api';
 
@@ -50,6 +51,22 @@ export default function Trips() {
   const openCreate = () => {
     setForm(emptyForm);
     setDialog({ open: true });
+  };
+
+  // Cancela uma ocorrência sem mexer no horário que a gerou
+  const handleCancel = async (t: Trip) => {
+    const reason = prompt(
+      `Cancelar a viagem ${t.routes?.origin} → ${t.routes?.destination} de ${formatDate(t.departure_time)}?\n\n` +
+      'Quem tinha reserva é avisado e o lugar é libertado. Indique o motivo (opcional):',
+    );
+    if (reason === null) return;
+    try {
+      const res = await tripActionsService.cancel(t.id, reason || undefined);
+      notify(`Viagem cancelada. ${res.bookings_cancelled} reserva(s) anulada(s).`, 'success');
+      refetch();
+    } catch (err: unknown) {
+      notify(err instanceof Error ? err.message : 'Erro ao cancelar', 'error');
+    }
   };
 
   const openEdit = (t: Trip) => {
@@ -137,6 +154,13 @@ export default function Trips() {
                         <Typography variant="body2" sx={{ fontWeight: 600, fontSize: 13 }}>
                           {t.routes?.origin} → {t.routes?.destination}
                         </Typography>
+                        {t.schedule_id && (
+                          <Chip
+                            label={t.direction === 'return' ? 'Horário · volta' : 'Horário · ida'}
+                            size="small"
+                            sx={{ mt: 0.5, height: 20, fontSize: 10, fontWeight: 700, bgcolor: '#EDE9FE', color: '#5B21B6' }}
+                          />
+                        )}
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontSize: 13 }}>
@@ -171,6 +195,14 @@ export default function Trips() {
                         />
                       </TableCell>
                       <TableCell align="center">
+                        {t.status === 'scheduled' && new Date(t.departure_time) > new Date() && (
+                          <Tooltip title="Cancelar esta viagem (feriado, avaria)">
+                            <IconButton size="small" onClick={() => handleCancel(t)}
+                              sx={{ color: colors.grey, '&:hover': { color: '#d32f2f', bgcolor: '#d32f2f15' } }}>
+                              <EventBusyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                         <IconButton size="small" onClick={() => openEdit(t)}
                           sx={{ color: colors.grey, '&:hover': { color: colors.primaryDark, bgcolor: `${colors.primary}15` } }}>
                           <EditIcon fontSize="small" />
